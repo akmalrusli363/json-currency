@@ -52,6 +52,24 @@ public class Currency {
     }
     
     /**
+     * Calculate target exchange rate from specified local exchange rate
+     * @param localCurrencyRate local currency rate
+     * @return price in target currency
+     */
+    public double calculateExchangeRate(double localCurrencyRate) {
+        return localCurrencyRate * exchangeRate;
+    }
+    
+    /**
+     * Calculate local exchange rate from specified target exchange price
+     * @param targetCurrencyRate target currency rate
+     * @return price in local currency
+     */
+    public double calculateReverseExchangeRate(double targetCurrencyRate) {
+        return targetCurrencyRate * reverseExchangeRate;
+    }
+    
+    /**
      * Get local currency to target currency rate
      * @param reverse true if want to obtain target currency to local currency rate
      * @return Name of target currency

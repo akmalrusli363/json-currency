@@ -30,12 +30,13 @@ public class CurrencyParser {
 
     /**
      * The string contains the web to visit. The hash symbol must included as
-     * "####" after URL and before ".JSON" file extension
+     * "####" after URL and before ".JSON" file extension.
      */
     public static final String CURRENCY_EXCHANGE_JSON_ADDRESS = "http://www.floatrates.com/daily/####.json";
 
     /**
-     * Locate the JSON Currency Exchange JSON Address
+     * Locate the JSON Currency Exchange JSON Address.
+     * <br>To override this method,
      *
      * @param jsonFileName the file name of JSON Currency Exchange (usually
      * local currency format)
@@ -52,8 +53,7 @@ public class CurrencyParser {
      * @param sourceCurrencyCode the source currency code to show in currency
      * exchange table
      * @throws Exception if any parse failure occurred
-     * @return Currency exchange list of foreign currency for local/source
-     * currency
+     * @return Currency exchange list of foreign currency for local/source currency
      */
     public static ArrayList<Currency> getCurrencyExchangeLists(String sourceCurrencyCode) throws Exception {
         // Query source currency conversion rate via floatrates
@@ -98,8 +98,7 @@ public class CurrencyParser {
      * @param sourceCurrencyCode source currency code
      * @param targetCurrencyCode destination currency code
      * @throws Exception if any parse error occurred
-     * @return currency exchange rate between source currency and target
-     * currency
+     * @return currency exchange rate between source currency and target currency
      */
     public static Currency getBetweenCurrencyExchangeRate(String sourceCurrencyCode, String targetCurrencyCode) throws Exception {
         // Query source currency conversion rate via floatrates
@@ -134,6 +133,7 @@ public class CurrencyParser {
      * @param sourceCurrencyCode source currency code
      * @param targetCurrencyCode destination currency code
      * @throws Exception if any parse error occurred
+     * @see getCalculatedCurrencyExchangeRate(String sourceCurrencyCode, String targetCurrencyCode, double rates)
      */
     private static void getCurrencyExchangeByJSON(String sourceCurrencyCode, String targetCurrencyCode) throws Exception {
         // Take a query for in-between currency exchange rate from currency exchange site
@@ -155,12 +155,13 @@ public class CurrencyParser {
 
     /**
      * Calculate the currency exchange rate from source currency to target
-     * currency at selected price
+     * currency with specified price
      *
      * @param sourceCurrencyCode source currency code
      * @param targetCurrencyCode destination currency code
-     * @param rates price in source currency
+     * @param rates specified currency exchange rate
      * @throws Exception if any parse error occurred
+     * @see getCurrencyExchangeByJSON(String sourceCurrencyCode, String targetCurrencyCode)
      */
     private static void getCalculatedCurrencyExchangeRate(String sourceCurrencyCode, String targetCurrencyCode, double rates) throws Exception {
         // Take a query for in-between currency exchange rate from currency exchange site
@@ -170,7 +171,7 @@ public class CurrencyParser {
         String source_curr_code = sourceCurrencyCode.toUpperCase();
         String target_curr_code = targetCurrencyCode.toUpperCase();
 
-        Double calculatedRate = curr.getCurrencyExchangeRate(false) * rates;
+        Double calculatedRate = curr.calculateExchangeRate(rates);
 
         // Display the conversion rate between source and destination currency
         System.out.printf("%s %.2f to %s exchange information:%n", source_curr_code, rates, target_curr_code);
@@ -188,6 +189,8 @@ public class CurrencyParser {
      * @param sourceCurrencyCode the source currency code to show in currency
      * exchange table
      * @throws Exception if any parse failure occurred
+     * @see getWholeSortedCurrencyExchangeTableFromJSON(String sourceCurrencyCode,
+     *   boolean local, boolean sortByCurrencyCode)
      */
     private static void getWholeCurrencyExchangeTableFromJSON(String sourceCurrencyCode) throws Exception {
         // Take a query for currency exchange table from currency exchange site
@@ -195,7 +198,7 @@ public class CurrencyParser {
 
         System.out.println(sourceCurrencyCode.toUpperCase() + " exchange information:");
         System.out.println("---------------------------------------------------");
-
+        
         for (Currency curr : currencyExchanges) {
             // Gather & print the properties
             String target_curr_name = curr.getTargetCurrencyExchangeName();
@@ -314,6 +317,7 @@ public class CurrencyParser {
             }
         } catch (Exception e) {
             // Finished, because no more data to parse it..
+            System.out.println("---------------------------------------------------");
             System.out.println("Done!");
         }
     }
@@ -351,7 +355,8 @@ public class CurrencyParser {
                     showInLocales = (args[1].equals("-showInLocalCurrency")) ? true : Boolean.parseBoolean(args[1].split(":")[1]);
                     sortByCurrencyCode = (args[2].equals("-sortByCurrencyCode")) ? true : Boolean.parseBoolean(args[2].split(":")[1]);
                     getWholeSortedCurrencyExchangeTableFromJSON(args[0], showInLocales, sortByCurrencyCode); //Sort by currency code and View Local
-                } else if ((args[2].equals("-showInLocalCurrency") || args[2].equals("-showInLocalCurrency:true") || args[2].equals("-showInLocalCurrency:false"))
+                }
+                else if ((args[2].equals("-showInLocalCurrency") || args[2].equals("-showInLocalCurrency:true") || args[2].equals("-showInLocalCurrency:false"))
                         && (args[1].equals("-sortByCurrencyCode") || args[1].equals("-sortByCurrencyCode:true") || args[1].equals("-sortByCurrencyCode:false"))) {
                     showInLocales = (args[2].equals("-showInLocalCurrency")) ? true : Boolean.parseBoolean(args[2].split(":")[1]);
                     sortByCurrencyCode = (args[1].equals("-sortByCurrencyCode")) ? true : Boolean.parseBoolean(args[1].split(":")[1]);
@@ -400,51 +405,65 @@ public class CurrencyParser {
             }
 
         } catch (NoSuchFieldException ex) {
-            System.out.println("JSON Currency Parser");
-            System.out.println("------------------------------------------");
-            System.out.println("Command lines:");
-            System.out.println("\'jsoncurrency.jar (help)\':\n"
-                    + " - Get help about JSON Currency Parser (you can empty the parameters or type 'help')");
-            System.out.println("");
-
-            System.out.println("\'jsoncurrency.jar demo\':\n"
-                    + " - Show demo from JSON Currency Parser (show USD conversion table)");
-            System.out.println("");
-
-            System.out.println("\'jsoncurrency.jar <currencyCodeExchanges>\':\n"
-                    + " - Show currency exchange table from currencyCodeExchanges\n"
-                    + " - Example : \'jsoncurrency.jar usd\' -> shows USD exchange table");
-            System.out.println("");
-
-            System.out.println("\'jsoncurrency.jar <currencyCodeExchanges> -buy/-sell\':\n"
-                    + " - Show currency buy/sell table rate from currencyCodeExchanges\n"
-                    + " - Example : \'jsoncurrency.jar usd -sell\' -> shows USD sell table");
-            System.out.println("");
-
-            System.out.println("\'jsoncurrency.jar <currencyFrom> <currencyTo>\':\n"
-                    + " - Show currency exchange rate from <currencyFrom> to <currencyTo>\n"
-                    + " - Example : \'jsoncurrency.jar idr usd\' -> shows IDR to USD exchange rate");
-            System.out.println("");
-
-            System.out.println("Addtional Parameters for <currencyCodeExchanges>:");
-            System.out.println("[{\"-buy\" or \"-sell\"}, \"-showInLocalCurrency:[true/false]\", \"-sortByCurrencyCode:[true/false]\"]");
-            System.out.println("----------------------------------------------------------------------------------");
-
-            System.out.println("\'-buy\': Show currency buy rate. Cannot paired with \'-showInLocalCurrency:[true/false]\'");
-            System.out.println("\'-sell\': Show currency sell rate. Cannot paired with \'-showInLocalCurrency:[true/false]\'");
-            System.out.println("");
-
-            System.out.println("\'-showInLocalCurrency:[true/false]\': Show currency exchange table by display local currency first (def: false)");
-            System.out.println(">> If true, display local currency first. Else, displays origin first. Cannot paired with \'-buy\' or \'-sell\'");
-            System.out.println("");
-
-            System.out.println("\'-sortByCurrencyCode:[true/false]\': Show currency exchange table by sort the currency code/country name first (def: false)");
-            System.out.println(">> If true, sort the currency code. Else, sort by country name.");
-            System.out.println("");
+            showHelp();
         } catch (Exception ex) {
             Logger.getLogger(CurrencyParser.class.getName()).log(Level.SEVERE, null, ex);
             System.err.println("Invalid command line parameter specified!");
             System.err.println("Please try with \'jsoncurrency.jar\' for parameters and further information!");
         }
     }
+    
+    /**
+     * Display JSON Currency Parser command line informations
+     */
+    private static void showHelp() {
+        System.out.println("JSON Currency Parser");
+            System.out.println("------------------------------------------");
+            System.out.println("Basic command line parameters:");
+            System.out.println("\'jsoncurrency.jar (help)\':\n"
+                    + " - Get help about JSON Currency Parser (you can empty the parameters or type 'help')");
+            System.out.println("");
+
+            System.out.println("\'jsoncurrency.jar demo\':\n"
+                    + " - Show demo from JSON Currency Parser (show USD conversion table, sorted in currency code)");
+            System.out.println("");
+
+            System.out.println("\'jsoncurrency.jar <currencyCode>\':\n"
+                    + " - Show currency exchange table from a currency <currencyCode>\n"
+                    + " - Example : \'jsoncurrency.jar usd\' -> shows USD exchange table");
+            System.out.println("");
+
+            System.out.println("\'jsoncurrency.jar <currencyCode> -buy/-sell\':\n"
+                    + " - Show currency buy/sell table rate from a currency <currencyCode>\n"
+                    + " - Example : \'jsoncurrency.jar usd -sell\' -> shows USD sell table");
+            System.out.println("");
+
+            System.out.println("\'jsoncurrency.jar <currencyFrom> <currencyTo>\':\n"
+                    + " - Show currency exchange rate from local currency <currencyFrom> to target currency <currencyTo>\n"
+                    + " - Example : \'jsoncurrency.jar usd idr\' -> shows USD to IDR exchange rate");
+            System.out.println("");
+
+            System.out.println("\'jsoncurrency.jar <currencyFrom> <currencyTo> <localCurrencyPrice>\':\n"
+                    + " - Calculate price of local currency <currencyFrom> to target currency <currencyTo>\n"
+                    + " - Example : \'jsoncurrency.jar usd idr 25\' -> calculate USD 25 to IDR");
+            System.out.println("");
+
+            System.out.println("Addtional Parameters for <currencyCodeExchanges>:");
+            System.out.println(" >> {\'-buy\' or \'-sell\' or \'-showInLocalCurrency:[true/false]\'}, \'-sortByCurrencyCode:[true/false]\'");
+            System.out.println("----------------------------------------------------------------------------------");
+
+            System.out.println("Currency buy/sell rate:");
+            System.out.println("\'-buy\': Show currency buy rate. Cannot paired with \'-showInLocalCurrency:[true/false]\'");
+            System.out.println("\'-sell\': Show currency sell rate. Cannot paired with \'-showInLocalCurrency:[true/false]\'");
+            System.out.println("");
+
+            System.out.println("\'-showInLocalCurrency:[true/false]\': Show currency exchange table by display local currency first (def: false)");
+            System.out.println(">> If true, display local currency first. Else, display target currency first. Cannot paired with \'-buy\' or \'-sell\'");
+            System.out.println("");
+
+            System.out.println("\'-sortByCurrencyCode:[true/false]\': Show currency exchange table by sort the currency code (def: false)");
+            System.out.println(">> If true, sort by currency code. Else, sort by country name.");
+            System.out.println("");
+    }
+    
 }

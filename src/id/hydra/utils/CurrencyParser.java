@@ -174,7 +174,7 @@ public class CurrencyParser {
         Double calculatedRate = curr.calculateExchangeRate(rates);
 
         // Display the conversion rate between source and destination currency
-        System.out.printf("%s %.2f to %s exchange information:%n", source_curr_code, rates, target_curr_code);
+        System.out.printf("%s %.2f to %s exchange rate:%n", source_curr_code, rates, target_curr_code);
         System.out.println("---------------------------------------------------");
         System.out.println("[!] Target currency : " + target_curr_name);
         System.out.printf("[B] %s to %s rate : %s %15.5f%n", source_curr_code, target_curr_code, target_curr_code, calculatedRate);
@@ -443,7 +443,7 @@ public class CurrencyParser {
                     + " - Example : \'jsoncurrency.jar usd idr\' -> shows USD to IDR exchange rate");
             System.out.println("");
 
-            System.out.println("\'jsoncurrency.jar <currencyFrom> <currencyTo> <localCurrencyPrice>\':\n"
+            System.out.println("\'jsoncurrency.jar <currencyFrom> <currencyTo> <localCurrencyRate>\':\n"
                     + " - Calculate price of local currency <currencyFrom> to target currency <currencyTo>\n"
                     + " - Example : \'jsoncurrency.jar usd idr 25\' -> calculate USD 25 to IDR");
             System.out.println("");
